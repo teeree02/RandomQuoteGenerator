@@ -1,7 +1,10 @@
 package com.example.randomquotegenerator
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
@@ -50,5 +53,29 @@ class MainActivity : AppCompatActivity() {
     fun onNextButtonClick(view: View) {
         loadRandomQuote()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_share -> {
+                shareQuote()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun shareQuote() {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "${quoteTV.text} ${authorTV.text}")
+        startActivity(Intent.createChooser(shareIntent, "Share using"))
+    }
+
 
 }
