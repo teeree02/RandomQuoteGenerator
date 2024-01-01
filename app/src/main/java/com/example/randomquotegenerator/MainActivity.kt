@@ -2,11 +2,53 @@ package com.example.randomquotegenerator
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.TextView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var quoteTV: TextView
+    private lateinit var authorTV: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        quoteTV = findViewById(R.id.quoteTextView)
+        authorTV = findViewById(R.id.authorTextView)
+
+        loadRandomQuote()
+
     }
+
+    private fun loadRandomQuote(){
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val quote = fetchRandomQuote()
+            displayQuote(quote)
+        }
+
+    }
+
+    private suspend fun fetchRandomQuote(): Quote{
+        return try{
+            RetrofitInstance.api.getRandomQuote()
+        } catch (e:Exception){
+            Quote("Error fetching quote","Unknown")
+        }
+    }
+
+    private fun displayQuote(quote: Quote){
+        quoteTV.text = "\"${quote.content}\""
+        authorTV.text = "- ${quote.author}"
+    }
+
+    fun onNextButtonClick(view: View) {
+        loadRandomQuote()
+    }
+
 }
