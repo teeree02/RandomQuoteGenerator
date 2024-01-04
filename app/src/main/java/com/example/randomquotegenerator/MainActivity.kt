@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -16,6 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var quoteTV: TextView
     private lateinit var authorTV: TextView
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,29 +25,35 @@ class MainActivity : AppCompatActivity() {
 
         quoteTV = findViewById(R.id.quoteTextView)
         authorTV = findViewById(R.id.authorTextView)
+        progressBar = findViewById(R.id.progressBar)
 
         loadRandomQuote()
 
     }
 
-    private fun loadRandomQuote(){
+    private fun loadRandomQuote() {
+
+        quoteTV.text = ""
+        authorTV.text = ""
+        progressBar.visibility = View.VISIBLE
 
         GlobalScope.launch(Dispatchers.Main) {
             val quote = fetchRandomQuote()
             displayQuote(quote)
+            progressBar.visibility = View.GONE
         }
 
     }
 
-    private suspend fun fetchRandomQuote(): Quote{
-        return try{
+    private suspend fun fetchRandomQuote(): Quote {
+        return try {
             RetrofitInstance.api.getRandomQuote()
-        } catch (e:Exception){
-            Quote("Error fetching quote","Unknown")
+        } catch (e: Exception) {
+            Quote("Error fetching quote", "Unknown")
         }
     }
 
-    private fun displayQuote(quote: Quote){
+    private fun displayQuote(quote: Quote) {
         quoteTV.text = "\"${quote.content}\""
         authorTV.text = "- ${quote.author}"
     }
